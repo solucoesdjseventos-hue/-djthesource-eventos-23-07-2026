@@ -5,6 +5,7 @@ import { services as defaultServices, ServiceConfig } from '../data/services';
 import './Home.css';
 
 const Home = () => {
+  const baseUrl = import.meta.env.BASE_URL;
   const [services, setServices] = useState<ServiceConfig[]>(defaultServices);
   const [loading, setLoading] = useState(true);
   const [showServices, setShowServices] = useState(false);
@@ -24,7 +25,7 @@ const Home = () => {
         <section className="hero-section">
           <div className="hero-media">
             <img
-              src="/LED-moving-Head-3.png"
+              src={`${baseUrl}LED-moving-Head-3.png`}
               alt="Moving head de iluminação para eventos"
               className="hero-image"
               loading="lazy"

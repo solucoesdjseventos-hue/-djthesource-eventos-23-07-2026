@@ -74,15 +74,18 @@ const Quote = () => {
       });
 
       if (!response.ok) {
-        const data = await response.json();
+        const data = await response.json().catch(() => ({}));
         throw new Error(data.error || 'Erro ao enviar orçamento');
       }
 
       setMessage('Orçamento enviado com sucesso ao organizador!');
     } catch (error: any) {
-      setMessage(`Falha ao enviar: ${error.message}`);
+      localStorage.setItem('djQuote', JSON.stringify({ ...quote, savedOffline: true }));
+      setMessage('Servidor indisponível. Orçamento salvo localmente no navegador.');
     }
   };
+
+  const baseUrl = import.meta.env.BASE_URL;
 
   return (
     <div className="page-shell">
@@ -216,7 +219,7 @@ const Quote = () => {
           <div className="service-image-container">
             <div className="image-frame">
               <img
-                src="/orcamentoeventos.webp"
+                src={`${baseUrl}orcamentoeventos.webp`}
                 alt="Orçamento de eventos"
                 className="service-title-image"
               />

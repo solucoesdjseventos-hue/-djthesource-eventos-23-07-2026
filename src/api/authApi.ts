@@ -9,30 +9,32 @@ type LoginPayload = {
   password: string;
 };
 
-const baseUrl = '/api/auth';
+const STORAGE_KEY = 'djTheSourceUsers';
 
-async function handleResponse(response: Response) {
-  const data = await response.json().catch(() => ({}));
-  if (!response.ok) {
-    throw new Error(data.error || 'Falha na comunicação com o servidor');
-  }
-  return data;
+function getUsers() {
+  const stored = localStorage.getItem(STORAGE_KEY);
+  return stored ? JSON.parse(stored) as Array<{ name: string; email: string; password: string }> : [];
+}
+
+function saveUsers(users: Array<{ name: string; email: string; password: string }>) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(users));
 }
 
 export async function registerClient(payload: RegisterPayload) {
-  const response = await fetch(`${baseUrl}/register`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload)
-  });
-  return handleResponse(response);
+  const users = getUsers();
+  if (users.find(user => user.email === payload.email)) {
+    throw new Error('E-mail já cadastrado. Faça login ou use outro e-mail.');
+  }
+  users.push(payload);
+  saveUsers(users);
+  return { name: payload.name, email: payload.email };
 }
 
 export async function loginClient(payload: LoginPayload) {
-  const response = await fetch(`${baseUrl}/login`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload)
-  });
-  return handleResponse(response);
+  const users = getUsers();
+  const user = users.find(user => user.email === payload.email && user.password === payload.password);
+  if (!user) {
+    throw new Error('E-mail ou senha incorretos.');
+  }
+  return { name: user.name, email: user.email };
 }

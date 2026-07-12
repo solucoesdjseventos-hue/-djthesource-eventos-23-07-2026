@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
-import { ServiceConfig } from '../data/services';
+import { ServiceConfig, services as defaultServices } from '../data/services';
 import './ServicePage.css';
 
 const guestLabels = [100, 200, 300, 400];
 
 const ServicePage = () => {
+  const baseUrl = import.meta.env.BASE_URL;
   const { serviceId } = useParams<{ serviceId: string }>();
   const [service, setService] = useState<ServiceConfig | undefined>();
   const [loading, setLoading] = useState(true);
@@ -38,7 +39,10 @@ const ServicePage = () => {
         setSelectedOptionIndex(0);
         setHours(1);
       })
-      .catch(() => setService(undefined))
+      .catch(() => {
+        const localService = defaultServices.find(item => item.id === serviceId);
+        setService(localService);
+      })
       .finally(() => setLoading(false));
   }, [serviceId]);
 
@@ -192,7 +196,7 @@ const ServicePage = () => {
             <div className="service-image-container">
               <div className="image-frame">
                 <img
-                  src="/audio-equipment.png"
+                  src={`${baseUrl}audio-equipment.png`}
                   alt="Equipamento de sonorização"
                   className="service-title-image"
                 />
@@ -203,7 +207,7 @@ const ServicePage = () => {
             <div className="service-image-container">
               <div className="image-frame">
                 <img
-                  src="/sonorizacao-equipment.png"
+                  src={`${baseUrl}sonorizacao-equipment.png`}
                   alt="Equipamento de iluminação"
                   className="service-title-image"
                 />
@@ -214,7 +218,7 @@ const ServicePage = () => {
             <div className="service-image-container">
               <div className="image-frame">
                 <img
-                  src="/garcons.jpg"
+                  src={`${baseUrl}garcons.jpg`}
                   alt="Garçons profissionais"
                   className="service-title-image"
                 />
@@ -225,7 +229,7 @@ const ServicePage = () => {
             <div className="service-image-container">
               <div className="image-frame">
                 <img
-                  src="/djs.jpg"
+                  src={`${baseUrl}djs.jpg`}
                   alt="DJ profissional"
                   className="service-title-image"
                 />
@@ -236,7 +240,7 @@ const ServicePage = () => {
             <div className="service-image-container">
               <div className="image-frame">
                 <img
-                  src="/decorador.jpg"
+                  src={`${baseUrl}decorador.jpg`}
                   alt="Decorador profissional"
                   className="service-title-image"
                 />
@@ -247,7 +251,7 @@ const ServicePage = () => {
             <div className="service-image-container">
               <div className="image-frame">
                 <img
-                  src="/salaoeventos.jpg"
+                  src={`${baseUrl}salaoeventos.jpg`}
                   alt="Salão de eventos"
                   className="service-title-image"
                 />
@@ -258,7 +262,7 @@ const ServicePage = () => {
             <div className="service-image-container">
               <div className="image-frame">
                 <img
-                  src="/recepcionista.jpg"
+                  src={`${baseUrl}recepcionista.jpg`}
                   alt="Recepcionistas profissionais"
                   className="service-title-image"
                 />

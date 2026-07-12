@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import Header from '../components/Header';
-import { fetchServices, updateService, addService } from '../api/serviceApi';
+import { fetchServices } from '../api/serviceApi';
 import type { ServiceConfig, ServiceOption } from '../data/services';
+import { services as defaultServices } from '../data/services';
 import './Admin.css';
 
 type QuoteItem = {
@@ -42,7 +43,7 @@ const Admin = () => {
   useEffect(() => {
     fetchServices()
       .then(setServices)
-      .catch(() => setServices([]))
+      .catch(() => setServices(defaultServices))
       .finally(() => setLoading(false));
 
     const storedQuoteText = localStorage.getItem('djQuote');
@@ -68,7 +69,7 @@ const Admin = () => {
       const data = await res.json();
       setSavedQuotes(data);
     } catch (err: any) {
-      setMessage(err.message || 'Erro ao carregar orçamentos');
+      setMessage('Backend indisponível no GitHub Pages. Orçamentos salvos localmente não podem ser carregados.');
     } finally {
       setLoadingSavedQuotes(false);
     }
@@ -80,18 +81,7 @@ const Admin = () => {
 
   const handleDeleteQuote = async (id: string) => {
     if (!window.confirm('Confirma exclusão deste orçamento?')) return;
-    try {
-      const res = await fetch(`/api/quotes/${id}`, { method: 'DELETE' });
-      if (res.status === 204) {
-        setMessage('Orçamento excluído com sucesso.');
-        fetchSavedQuotes();
-      } else {
-        const data = await res.json();
-        setMessage(data.error || 'Falha ao excluir orcamento');
-      }
-    } catch (err: any) {
-      setMessage(err.message || 'Erro ao excluir orcamento');
-    }
+    setMessage('Backend indisponível no GitHub Pages. Exclusão de orçamentos remotos não é suportada.');
   };
 
   const toggleQuoteItem = (itemId: string) => {
@@ -133,35 +123,21 @@ const Admin = () => {
     } : service));
   };
 
-  const handleUpdate = async (service: ServiceConfig) => {
-    try {
-      const parsedValues = service.values.map(Number);
-      const serializedOptions = service.options?.map(option => ({ ...option, price: Number(option.price) }));
-      const updated = await updateService({ ...service, values: parsedValues, options: serializedOptions });
-      setServices(prev => prev.map(item => item.id === updated.id ? updated : item));
-      setMessage(`Serviço ${updated.title} atualizado com sucesso.`);
-    } catch (error: any) {
-      setMessage(error.message);
-    }
+  const handleUpdate = (service: ServiceConfig) => {
+    setServices(prev => prev.map(item => item.id === service.id ? service : item));
+    setMessage(`Serviço ${service.title} atualizado localmente. Backend não disponível no GitHub Pages.`);
   };
 
-  const handleAddService = async () => {
-    try {
-      const created = await addService({
-        title: newService.title,
-        description: newService.description,
-        rateLabel: newService.rateLabel,
-        unitLabel: newService.unitLabel,
-        basePrice: Number(newService.basePrice),
-        values: newService.values.split(',').map(value => Number(value.trim())),
-        hourly: Boolean(newService.hourly)
-      });
-      setServices(prev => [...prev, created]);
-      setMessage(`Serviço ${created.title} criado com sucesso.`);
-      setNewService({ title: '', description: '', rateLabel: 'Valor por hora', unitLabel: 'horas', basePrice: 0, values: '0,0', hourly: true });
-    } catch (error: any) {
-      setMessage(error.message);
-    }
+  const handleAddService = () => {
+    const created: ServiceConfig = {
+      ...newService,
+      id: `${newService.title.toLowerCase().replace(/\s+/g, '-')}-${Date.now()}`,
+      values: newService.values.split(',').map(value => Number(value.trim())),
+      editable: true
+    } as ServiceConfig;
+    setServices(prev => [...prev, created]);
+    setMessage(`Serviço ${created.title} adicionado localmente. Backend não disponível no GitHub Pages.`);
+    setNewService({ title: '', description: '', rateLabel: 'Valor por hora', unitLabel: 'horas', basePrice: 0, values: '0,0', hourly: true });
   };
 
   return (

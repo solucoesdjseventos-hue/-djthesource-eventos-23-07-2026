@@ -25,6 +25,8 @@ const Header = () => {
     navigate('/');
   };
 
+  const baseUrl = import.meta.env.BASE_URL;
+
   return (
     <header className="header">
       <div className="brand">
@@ -35,7 +37,7 @@ const Header = () => {
           onMouseLeave={() => setMenuOpen(false)}
         >
           <img
-            src="/LED-moving-Head-3.png"
+            src={`${baseUrl}LED-moving-Head-3.png`}
             alt="DJ The Source"
             className="brand-image"
           />
