@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import Header from '../components/Header';
-import { fetchServices } from '../api/serviceApi';
+import { fetchServices, updateService, addService } from '../api/serviceApi';
 import type { ServiceConfig, ServiceOption } from '../data/services';
 import { services as defaultServices } from '../data/services';
 import './Admin.css';
@@ -69,7 +69,7 @@ const Admin = () => {
       const data = await res.json();
       setSavedQuotes(data);
     } catch (err: any) {
-      setMessage('Backend indisponível no GitHub Pages. Orçamentos salvos localmente não podem ser carregados.');
+      setMessage('Falha ao carregar orçamentos do backend. Verifique sua conexão ou configuração do Supabase.');
     } finally {
       setLoadingSavedQuotes(false);
     }
@@ -81,7 +81,17 @@ const Admin = () => {
 
   const handleDeleteQuote = async (id: string) => {
     if (!window.confirm('Confirma exclusão deste orçamento?')) return;
-    setMessage('Backend indisponível no GitHub Pages. Exclusão de orçamentos remotos não é suportada.');
+    try {
+      const res = await fetch(`/api/quotes/${id}`, { method: 'DELETE' });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || 'Erro ao excluir orçamento');
+      }
+      setSavedQuotes(prev => prev.filter(q => q.id !== id));
+      setMessage('Orçamento excluído com sucesso.');
+    } catch (err: any) {
+      setMessage(err.message || 'Falha ao excluir orçamento via backend.');
+    }
   };
 
   const toggleQuoteItem = (itemId: string) => {
@@ -123,21 +133,35 @@ const Admin = () => {
     } : service));
   };
 
-  const handleUpdate = (service: ServiceConfig) => {
-    setServices(prev => prev.map(item => item.id === service.id ? service : item));
-    setMessage(`Serviço ${service.title} atualizado localmente. Backend não disponível no GitHub Pages.`);
+  const handleUpdate = async (service: ServiceConfig) => {
+    try {
+      const updated = await updateService(service);
+      setServices(prev => prev.map(item => item.id === updated.id ? updated : item));
+      setMessage(`Serviço ${updated.title} atualizado com sucesso.`);
+    } catch (err: any) {
+      setMessage(err.message || 'Falha ao atualizar serviço.');
+    }
   };
 
-  const handleAddService = () => {
-    const created: ServiceConfig = {
-      ...newService,
-      id: `${newService.title.toLowerCase().replace(/\s+/g, '-')}-${Date.now()}`,
-      values: newService.values.split(',').map(value => Number(value.trim())),
-      editable: true
-    } as ServiceConfig;
-    setServices(prev => [...prev, created]);
-    setMessage(`Serviço ${created.title} adicionado localmente. Backend não disponível no GitHub Pages.`);
-    setNewService({ title: '', description: '', rateLabel: 'Valor por hora', unitLabel: 'horas', basePrice: 0, values: '0,0', hourly: true });
+  const handleAddService = async () => {
+    try {
+      const created: Omit<ServiceConfig, 'id' | 'editable'> = {
+        title: newService.title,
+        description: newService.description,
+        rateLabel: newService.rateLabel,
+        unitLabel: newService.unitLabel,
+        basePrice: Number(newService.basePrice),
+        values: newService.values.split(',').map(value => Number(value.trim())),
+        hourly: newService.hourly,
+        options: undefined
+      };
+      const result = await addService(created);
+      setServices(prev => [...prev, result]);
+      setMessage(`Serviço ${result.title} adicionado com sucesso.`);
+      setNewService({ title: '', description: '', rateLabel: 'Valor por hora', unitLabel: 'horas', basePrice: 0, values: '0,0', hourly: true });
+    } catch (err: any) {
+      setMessage(err.message || 'Falha ao adicionar serviço.');
+    }
   };
 
   return (

@@ -49,6 +49,21 @@ cd ..\client
 npm run dev
 ```
 
-## Configuração de email
+## Configuração de email e Supabase
 
 Copie `.env.example` para `.env` em `server/` e ajuste as variáveis SMTP.
+
+Adicione também as variáveis Supabase:
+
+- `SUPABASE_URL`
+- `SUPABASE_SERVICE_ROLE_KEY`
+
+Crie as tabelas no Supabase usando o arquivo `server/supabase-tables.sql`, ou execute as instruções no SQL Editor.
+
+As tabelas necessárias são:
+
+- `services`
+- `clients`
+- `quotes`
+
+As colunas incluem campos como `id`, `title`, `description`, `rateLabel`, `unitLabel`, `basePrice`, `values`, `hourly`, `options`, `createdAt`, `quoteText`, `clientName`, `clientEmail`, `clientPhone`, `organizerEmail`, `password` e `email`.
