@@ -34,6 +34,7 @@ const sendQuote = async (req, res) => {
         });
     }
 
+    let quoteSaved = false;
     try {
       const id = `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
       await addQuoteRow({
@@ -45,8 +46,13 @@ const sendQuote = async (req, res) => {
         quoteText: JSON.stringify(quote),
         createdAt: new Date().toISOString(),
       });
+      quoteSaved = true;
     } catch (storeErr) {
       console.error("Erro ao salvar orçamento no Supabase:", storeErr);
+    }
+
+    if (!quoteSaved) {
+      return res.status(500).json({ error: 'Orçamento não pôde ser salvo no Supabase.' });
     }
 
     const transporter = createTransporter();

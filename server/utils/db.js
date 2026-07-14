@@ -1,9 +1,14 @@
 const { supabase } = require("./supabaseClient");
 
 async function addQuoteRow(row) {
+  const newRow = {
+    ...row,
+    quoteText: typeof row.quoteText === 'string' ? JSON.parse(row.quoteText) : row.quoteText,
+  };
+
   const { data, error } = await supabase
     .from("quotes")
-    .insert([row])
+    .insert([newRow])
     .select()
     .single();
   if (error) throw error;
