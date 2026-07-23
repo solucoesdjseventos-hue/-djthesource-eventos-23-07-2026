@@ -1,6 +1,6 @@
-const nodemailer = require('nodemailer');
-const { addQuoteRow, getAllQuotes, deleteQuote } = require('../utils/db');
-const { supabase } = require('../utils/supabaseClient');
+const nodemailer = require("nodemailer");
+const { addQuoteRow, getAllQuotes, deleteQuote } = require("../utils/db");
+const { supabase } = require("../utils/supabaseClient");
 
 const createTransporter = () => {
   const host = process.env.SMTP_HOST;
@@ -27,28 +27,27 @@ const sendQuote = async (req, res) => {
     const { clientName, clientEmail, clientPhone, organizerEmail, quote } =
       req.body;
     if (!organizerEmail || !quote || !clientName || !clientEmail) {
-      return res
-        .status(400)
-        .json({
-          error:
-            "organizerEmail, clientName, clientEmail and quote are required",
-        });
+      return res.status(400).json({
+        error: "organizerEmail, clientName, clientEmail and quote are required",
+      });
     }
 
     const id = `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
     try {
       await addQuoteRow({
         id,
-        clientName: clientName || '',
-        clientEmail: clientEmail || '',
-        clientPhone: clientPhone || '',
-        organizerEmail: organizerEmail || '',
+        clientName: clientName || "",
+        clientEmail: clientEmail || "",
+        clientPhone: clientPhone || "",
+        organizerEmail: organizerEmail || "",
         quoteText: JSON.stringify(quote),
         createdAt: new Date().toISOString(),
       });
     } catch (storeErr) {
-      console.error('Erro ao salvar orçamento no DB local:', storeErr);
-      return res.status(500).json({ error: 'Orçamento não pôde ser salvo no banco local.' });
+      console.error("Erro ao salvar orçamento no DB local:", storeErr);
+      return res
+        .status(500)
+        .json({ error: "Orçamento não pôde ser salvo no banco local." });
     }
 
     const transporterConfigured =
@@ -60,41 +59,53 @@ const sendQuote = async (req, res) => {
     // persist quote to Supabase
     if (supabase) {
       const { data: orcamento, error: orcamentoError } = await supabase
-        .from('orcamentos')
-        .insert([{
-          nome_cliente: clientName || '',
-          email_cliente: clientEmail || '',
-          telefone_cliente: clientPhone || '',
-          nome_evento: quote.eventName || '',
-          email_organizador: organizerEmail || '',
-          valor_total: quote.total || 0
-        }])
-        .select('id')
+        .from("orcamentos")
+        .insert([
+          {
+            nome_cliente: clientName || "",
+            email_cliente: clientEmail || "",
+            telefone_cliente: clientPhone || "",
+            nome_evento: quote.eventName || "",
+            email_organizador: organizerEmail || "",
+            valor_total: quote.total || 0,
+          },
+        ])
+        .select("id")
         .single();
 
       if (orcamentoError) {
-        console.error('Erro ao inserir orcamento no Supabase:', orcamentoError);
-        return res.status(500).json({ error: 'Erro ao salvar orçamento no Supabase' });
+        console.error("Erro ao inserir orcamento no Supabase:", orcamentoError);
+        return res
+          .status(500)
+          .json({ error: "Erro ao salvar orçamento no Supabase" });
       }
 
       const orcamentoId = orcamento?.id;
-      const servicos = (quote.items || []).map(item => ({
+      const servicos = (quote.items || []).map((item) => ({
         orcamento_id: orcamentoId,
-        nome_servico: item.title || '',
-        descricao: item.info || '',
+        nome_servico: item.title || "",
+        descricao: item.info || "",
         quantidade: 1,
-        preco_unitario: item.total || 0
+        preco_unitario: item.total || 0,
       }));
 
       if (servicos.length) {
-        const { error: servicosError } = await supabase.from('orcamento_servicos').insert(servicos);
+        const { error: servicosError } = await supabase
+          .from("orcamento_servicos")
+          .insert(servicos);
         if (servicosError) {
-          console.error('Erro ao inserir servicos no Supabase:', servicosError);
-          return res.status(500).json({ error: 'Erro ao salvar serviços do orçamento no Supabase' });
+          console.error("Erro ao inserir servicos no Supabase:", servicosError);
+          return res
+            .status(500)
+            .json({
+              error: "Erro ao salvar serviços do orçamento no Supabase",
+            });
         }
       }
     } else {
-      console.warn('Supabase não está configurado. Ajuste SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY ou SUPABASE_KEY.');
+      console.warn(
+        "Supabase não está configurado. Ajuste SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY ou SUPABASE_KEY.",
+      );
     }
 
     const html = `
@@ -155,7 +166,7 @@ const listQuotes = async (req, res) => {
       clientPhone: r.clientPhone,
       organizerEmail: r.organizerEmail,
       quote: r.quoteText
-        ? typeof r.quoteText === 'string'
+        ? typeof r.quoteText === "string"
           ? JSON.parse(r.quoteText)
           : r.quoteText
         : null,
