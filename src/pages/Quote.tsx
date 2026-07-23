@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import Header from '../components/Header';
-import { supabase } from '../../supabaseClient';
+import { supabase } from '../supabaseClient';
 import './Quote.css';
 
 type QuoteItem = {
