@@ -1,14 +1,12 @@
-
-
 const baseUrl = '/api/services';
 
-export async function fetchServices()]> {
+export async function fetchServices() {
   const response = await fetch(baseUrl);
   if (!response.ok) throw new Error('Falha ao buscar serviços');
   return response.json();
 }
 
-export async function fetchServiceById(id): Promise<ServiceConfig> {
+export async function fetchServiceById(id) {
   const response = await fetch(`${baseUrl}/${id}`);
   if (!response.ok) throw new Error('Serviço não encontrado');
   return response.json();
@@ -16,22 +14,22 @@ export async function fetchServiceById(id): Promise<ServiceConfig> {
 
 export async function updateService(service) {
   const response = await fetch(`${baseUrl}/edit`, {
-    method,
-    headers,
-    body)
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(service)
   });
   if (!response.ok) throw new Error('Falha ao atualizar serviço');
   return response.json();
 }
 
-export async function addService(service, 'id' | 'editable'>) {
+export async function addService(service) {
   const response = await fetch(`${baseUrl}/add`, {
-    method,
-    headers,
-    body)
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(service)
   });
   if (!response.ok) {
-    const errorData = await response.json().catch(() => ({ error));
+    const errorData = await response.json().catch(() => ({ error: 'Erro ao criar serviço' }));
     throw new Error(errorData.error || 'Erro ao criar serviço');
   }
   return response.json();

@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
-import { ServiceConfig } from '../data/services';
 import './ServicePage.css';
 
 const guestLabels = [100, 200, 300, 400];
@@ -33,7 +32,7 @@ const ServicePage = () => {
       })
       .then(data => {
         setService(data);
-        setQuantity(data.hourly ? 1 ]);
+        setQuantity(data.hourly ? 1 : guestLabels[0]);
         setPriceIndex(0);
         setSelectedOptionIndex(0);
         setHours(1);
@@ -44,7 +43,7 @@ const ServicePage = () => {
 
   useEffect(() => {
     if (service) {
-      setQuantity(service.hourly ? 1 ]);
+      setQuantity(service.hourly ? 1 : guestLabels[0]);
       setPriceIndex(0);
       setSelectedOptionIndex(0);
       setHours(1);
@@ -55,29 +54,32 @@ const ServicePage = () => {
   if (!service) return <div>Serviço não encontrado.</div>;
 
   const selectedOption = service.options?.[selectedOptionIndex];
-  const selectedPrice = service.hourly && selectedOption ? selectedOption.price ];
-  const total = service.hourly ? selectedPrice * hours ;
+  const selectedPrice = service.hourly && selectedOption ? selectedOption.price : service.values[priceIndex];
+  const total = service.hourly ? selectedPrice * hours : selectedPrice;
 
   const handleSubmit = (event) => {
     event.preventDefault();
     const stored = localStorage.getItem('djQuote');
-    const current = stored ? JSON.parse(stored) ], total, salon, clientName, theme, address, eventStart, eventEnd;
+    const current = stored ? JSON.parse(stored) : { items: [], total: 0, salon: '', clientName: '', theme: '', address: '', eventStart: '', eventEnd: '' };
     const item = {
-      id,
-      title,
-      info,
+      id: service.id,
+      title: service.title,
+      info: service.hourly
+        ? `${hours} ${service.unitLabel}${selectedOption ? ` • ${selectedOption.label}` : ''}`
+        : `${quantity} convidados`,
       total
     };
 
     const next = {
       ...current,
-      items) => entry.id !== service.id), item],
-      total) => entry.id === service.id)?.total || 0) + total).toFixed(2)),
-      salon: service.id === 'salao' ? `${quantity} convidados` ,
-      theme: service.id === 'salao' ? eventTheme ,
-      address: service.id === 'salao' ? eventAddress ,
-      eventStart: service.id === 'salao' ? eventStart ,
-      eventEnd: service.id === 'salao' ? eventEnd ;
+      items: [...current.items.filter((entry) => entry.id !== service.id), item],
+      total: Number((current.total - (current.items.find((entry) => entry.id === service.id)?.total || 0) + total).toFixed(2)),
+      salon: service.id === 'salao' ? `${quantity} convidados` : current.salon,
+      theme: service.id === 'salao' ? eventTheme : current.theme,
+      address: service.id === 'salao' ? eventAddress : current.address,
+      eventStart: service.id === 'salao' ? eventStart : current.eventStart,
+      eventEnd: service.id === 'salao' ? eventEnd : current.eventEnd
+    };
     localStorage.setItem('djQuote', JSON.stringify(next));
     navigate('/orcamento');
   };
@@ -151,7 +153,7 @@ const ServicePage = () => {
                     type="text"
                     value={eventTheme}
                     onChange={e => setEventTheme(e.target.value)}
-                    placeholder="Ex, Aniversário"
+                    placeholder="Ex: Casamento, Aniversário"
                   />
                 </label>
                 <label>
@@ -181,7 +183,7 @@ const ServicePage = () => {
                 </label>
               </div>
             )}
-            <p className="service-total">Total)}</p>
+            <p className="service-total">Total: R$ {total.toFixed(2)}</p>
             <button type="submit">Adicionar ao orçamento</button>
           </form>
           </div>

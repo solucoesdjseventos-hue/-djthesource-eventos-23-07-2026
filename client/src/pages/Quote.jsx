@@ -2,24 +2,21 @@ import { useEffect, useState } from 'react';
 import Header from '../components/Header';
 import './Quote.css';
 
-
-
-
-
 const Quote = () => {
   const [quote, setQuote] = useState({
-    items],
-    total,
-    salon,
-    clientName,
-    eventName,
-    clientEmail,
-    clientPhone);
+    items: [],
+    total: 0,
+    salon: '',
+    clientName: '',
+    eventName: '',
+    clientEmail: '',
+    clientPhone: ''
+  });
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
 
   const scrollToTop = () => {
-    window.scrollTo({ top, behavior);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   useEffect(() => {
@@ -27,18 +24,19 @@ const Quote = () => {
     if (stored) {
       const storedQuote = JSON.parse(stored);
       setQuote({
-        items],
-        total,
-        salon,
-        clientName,
-        eventName,
-        clientEmail,
-        clientPhone);
+        items: storedQuote.items || [],
+        total: storedQuote.total || 0,
+        salon: storedQuote.salon || '',
+        clientName: storedQuote.clientName || '',
+        eventName: storedQuote.eventName || '',
+        clientEmail: storedQuote.clientEmail || '',
+        clientPhone: storedQuote.clientPhone || ''
+      });
     }
   }, []);
 
-  const updateQuoteField = (field, 'items' | 'total' | 'salon'>, value) => {
-    const next = { ...quote, [field];
+  const updateQuoteField = (field, value) => {
+    const next = { ...quote, [field]: value };
     setQuote(next);
     localStorage.setItem('djQuote', JSON.stringify(next));
   };
@@ -46,13 +44,14 @@ const Quote = () => {
   const sendQuote = async () => {
     try {
       const response = await fetch('/api/quote', {
-        method,
-        headers,
-        body,
-          clientName,
-          clientEmail,
-          clientPhone,
-          organizerEmail,
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          eventName: quote.eventName,
+          clientName: quote.clientName,
+          clientEmail: quote.clientEmail,
+          clientPhone: quote.clientPhone,
+          organizerEmail: email,
           quote
         })
       });
@@ -64,7 +63,7 @@ const Quote = () => {
 
       setMessage('Orçamento enviado com sucesso ao organizador!');
     } catch (error) {
-      setMessage(`Falha ao enviar);
+      setMessage(`Falha ao enviar: ${error?.message || error}`);
     }
   };
 
@@ -170,7 +169,7 @@ const Quote = () => {
                     id="eventName"
                     type="text"
                     value={quote.eventName}
-                    placeholder="Ex, Aniversário"
+                    placeholder="Ex: Casamento, Aniversário"
                     onChange={e => updateQuoteField('eventName', e.target.value)}
                   />
                 </div>

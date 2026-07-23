@@ -1,7 +1,4 @@
 
-
-
-
 const baseUrl = '/api/auth';
 
 async function handleResponse(response) {
@@ -14,18 +11,18 @@ async function handleResponse(response) {
 
 export async function registerClient(payload) {
   const response = await fetch(`${baseUrl}/register`, {
-    method,
-    headers,
-    body)
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
   });
   return handleResponse(response);
 }
 
 export async function loginClient(payload) {
   const response = await fetch(`${baseUrl}/login`, {
-    method,
-    headers,
-    body)
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
   });
   return handleResponse(response);
 }

@@ -28,7 +28,7 @@ const Register = () => {
 
     try {
       const client = await registerClient({ name, email, password });
-      localStorage.setItem('djClient', JSON.stringify({ name, email));
+      localStorage.setItem('djClient', JSON.stringify({ name, email }));
       navigate('/');
     } catch (error) {
       setMessage(error.message || 'Falha ao cadastrar cliente.');

@@ -1,9 +1,9 @@
-
 export const services = [
   {
     id: "sonorizacao",
     title: "Sonorização",
-    description: "Som profissional para eventos com sistema de áudio de alta potência.",
+    description:
+      "Som profissional para eventos com sistema de áudio de alta potência.",
     rateLabel: "Valor por hora",
     unitLabel: "horas",
     basePrice: 300,
@@ -13,17 +13,20 @@ export const services = [
     options: [
       {
         label: "Kit Palestra / Corporativo Pequeno",
-        description: "2 caixas com pedestal + 1 mesa pequena + 2 microfones sem fio + cabos.",
+        description:
+          "2 caixas com pedestal + 1 mesa pequena + 2 microfones sem fio + cabos.",
         price: 180,
       },
       {
         label: "Kit Festa / DJ (até 150 pessoas)",
-        description: "2 caixas principais + 1 ou 2 subwoofers + mesa de som + microfone.",
+        description:
+          "2 caixas principais + 1 ou 2 subwoofers + mesa de som + microfone.",
         price: 260,
       },
       {
         label: "Kit Banda / Show Médio",
-        description: "Sistema line array ou caixas de alta potência + mesa digital + kit de microfones + retornos.",
+        description:
+          "Sistema line array ou caixas de alta potência + mesa digital + kit de microfones + retornos.",
         price: 420,
       },
     ],
@@ -31,7 +34,8 @@ export const services = [
   {
     id: "iluminacao",
     title: "Iluminação",
-    description: "Iluminação cênica e moving heads para efeitos modernos e sensoriais.",
+    description:
+      "Iluminação cênica e moving heads para efeitos modernos e sensoriais.",
     rateLabel: "Valor por hora",
     unitLabel: "horas",
     basePrice: 280,
@@ -41,17 +45,20 @@ export const services = [
     options: [
       {
         label: "Iluminação Cênica Simples",
-        description: "8 a 10 refletores Par LED para ambientar o salão ou destacar pontos específicos.",
+        description:
+          "8 a 10 refletores Par LED para ambientar o salão ou destacar pontos específicos.",
         price: 180,
       },
       {
         label: "Pista de Dança Clássica",
-        description: "1 trave de box truss + 2 moving heads + 4 par LEDs + 1 máquina de fumaça + 1 estrobo.",
+        description:
+          "1 trave de box truss + 2 moving heads + 4 par LEDs + 1 máquina de fumaça + 1 estrobo.",
         price: 320,
       },
       {
         label: "Pista de Dança Premium",
-        description: "Estrutura em X ou quadrado com 4 a 8 moving heads potentes, estrobos, lasers, máquina haze e ribaltas de LED.",
+        description:
+          "Estrutura em X ou quadrado com 4 a 8 moving heads potentes, estrobos, lasers, máquina haze e ribaltas de LED.",
         price: 560,
       },
     ],
@@ -59,7 +66,8 @@ export const services = [
   {
     id: "garcons",
     title: "Garçons",
-    description: "Equipe de garçons profissional para atendimento de convidados.",
+    description:
+      "Equipe de garçons profissional para atendimento de convidados.",
     rateLabel: "Valor por hora",
     unitLabel: "horas",
     basePrice: 40,
@@ -70,7 +78,8 @@ export const services = [
   {
     id: "recepcionistas",
     title: "Recepcionistas",
-    description: "Recepção e organização de convidados com cordialidade e eficiência.",
+    description:
+      "Recepção e organização de convidados com cordialidade e eficiência.",
     rateLabel: "Valor por hora",
     unitLabel: "horas",
     basePrice: 45,
@@ -103,7 +112,8 @@ export const services = [
   {
     id: "salao",
     title: "Locação de Salão",
-    description: "Salões adaptados conforme número de convidados e estrutura completa.",
+    description:
+      "Salões adaptados conforme número de convidados e estrutura completa.",
     rateLabel: "Valor do salão",
     unitLabel: "convidados",
     basePrice: 0,

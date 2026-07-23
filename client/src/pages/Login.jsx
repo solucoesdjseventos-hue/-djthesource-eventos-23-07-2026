@@ -21,7 +21,7 @@ const Login = () => {
 
     try {
       const client = await loginClient({ email, password });
-      localStorage.setItem('djClient', JSON.stringify({ name, email));
+      localStorage.setItem('djClient', JSON.stringify({ name: client?.name || '', email }));
       navigate('/');
     } catch (error) {
       setMessage(error.message || 'Falha no login.');
