@@ -1,5 +1,11 @@
+<<<<<<< HEAD
 const nodemailer = require("nodemailer");
 const { addQuoteRow, getAllQuotes, deleteQuote } = require("../utils/db");
+=======
+const nodemailer = require('nodemailer');
+const { addQuoteRow, getAllQuotes, deleteQuote } = require('../utils/db');
+const { supabase } = require('../utils/supabaseClient');
+>>>>>>> 494b185 (Teste de salvamento no supabase)
 
 const createTransporter = () => {
   const host = process.env.SMTP_HOST;
@@ -50,12 +56,56 @@ const sendQuote = async (req, res) => {
       return res.status(500).json({ error: 'Orçamento não pôde ser salvo no Supabase.' });
     }
 
+<<<<<<< HEAD
     const transporterConfigured =
       process.env.SMTP_HOST &&
       process.env.SMTP_PORT &&
       process.env.SMTP_USER &&
       process.env.SMTP_PASS;
 
+=======
+    // persist quote to Supabase
+    if (supabase) {
+      const { data: orcamento, error: orcamentoError } = await supabase
+        .from('orcamentos')
+        .insert([{
+          nome_cliente: clientName || '',
+          email_cliente: clientEmail || '',
+          telefone_cliente: clientPhone || '',
+          nome_evento: quote.eventName || '',
+          email_organizador: organizerEmail || '',
+          valor_total: quote.total || 0
+        }])
+        .select('id')
+        .single();
+
+      if (orcamentoError) {
+        console.error('Erro ao inserir orcamento no Supabase:', orcamentoError);
+        return res.status(500).json({ error: 'Erro ao salvar orçamento no Supabase' });
+      }
+
+      const orcamentoId = orcamento?.id;
+      const servicos = (quote.items || []).map(item => ({
+        orcamento_id: orcamentoId,
+        nome_servico: item.title || '',
+        descricao: item.info || '',
+        quantidade: 1,
+        preco_unitario: item.total || 0
+      }));
+
+      if (servicos.length) {
+        const { error: servicosError } = await supabase.from('orcamento_servicos').insert(servicos);
+        if (servicosError) {
+          console.error('Erro ao inserir servicos no Supabase:', servicosError);
+          return res.status(500).json({ error: 'Erro ao salvar serviços do orçamento no Supabase' });
+        }
+      }
+    } else {
+      console.warn('Supabase não está configurado. Ajuste SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY ou SUPABASE_ANON_KEY.');
+    }
+
+    const transporter = createTransporter();
+>>>>>>> 494b185 (Teste de salvamento no supabase)
     const html = `
       <h1>Orçamento DJ The Source</h1>
       <p><strong>Cliente</strong>: ${clientName || "Não informado"}</p>
