@@ -1,11 +1,6 @@
-<<<<<<< HEAD
-const nodemailer = require("nodemailer");
-const { addQuoteRow, getAllQuotes, deleteQuote } = require("../utils/db");
-=======
 const nodemailer = require('nodemailer');
 const { addQuoteRow, getAllQuotes, deleteQuote } = require('../utils/db');
 const { supabase } = require('../utils/supabaseClient');
->>>>>>> 494b185 (Teste de salvamento no supabase)
 
 const createTransporter = () => {
   const host = process.env.SMTP_HOST;
@@ -44,26 +39,24 @@ const sendQuote = async (req, res) => {
     try {
       await addQuoteRow({
         id,
-        clientName: clientName || "",
-        clientEmail: clientEmail || "",
-        clientPhone: clientPhone || "",
-        organizerEmail: organizerEmail || "",
+        clientName: clientName || '',
+        clientEmail: clientEmail || '',
+        clientPhone: clientPhone || '',
+        organizerEmail: organizerEmail || '',
         quoteText: JSON.stringify(quote),
         createdAt: new Date().toISOString(),
       });
     } catch (storeErr) {
-      console.error("Erro ao salvar orçamento no Supabase:", storeErr);
-      return res.status(500).json({ error: 'Orçamento não pôde ser salvo no Supabase.' });
+      console.error('Erro ao salvar orçamento no DB local:', storeErr);
+      return res.status(500).json({ error: 'Orçamento não pôde ser salvo no banco local.' });
     }
 
-<<<<<<< HEAD
     const transporterConfigured =
       process.env.SMTP_HOST &&
       process.env.SMTP_PORT &&
       process.env.SMTP_USER &&
       process.env.SMTP_PASS;
 
-=======
     // persist quote to Supabase
     if (supabase) {
       const { data: orcamento, error: orcamentoError } = await supabase
@@ -101,11 +94,9 @@ const sendQuote = async (req, res) => {
         }
       }
     } else {
-      console.warn('Supabase não está configurado. Ajuste SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY ou SUPABASE_ANON_KEY.');
+      console.warn('Supabase não está configurado. Ajuste SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY ou SUPABASE_KEY.');
     }
 
-    const transporter = createTransporter();
->>>>>>> 494b185 (Teste de salvamento no supabase)
     const html = `
       <h1>Orçamento DJ The Source</h1>
       <p><strong>Cliente</strong>: ${clientName || "Não informado"}</p>
