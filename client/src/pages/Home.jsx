@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import Header from '../components/Header';
 import ServiceCard from '../components/ServiceCard';
-import { services ServiceConfig } from '../data/services';
+import { services as defaultServices } from '../data/services';
 import './Home.css';
 
 const Home = () => {
