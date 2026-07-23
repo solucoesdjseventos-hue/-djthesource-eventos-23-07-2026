@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import Header from '../components/Header';
+import { supabase } from '../../supabaseClient';
 import './Quote.css';
 
 type QuoteItem = {
@@ -61,35 +62,46 @@ const Quote = () => {
 
   const sendQuote = async () => {
     try {
-      const response = await fetch('/api/quote', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          eventName: quote.eventName,
-          clientName: quote.clientName,
-          clientEmail: quote.clientEmail,
-          clientPhone: quote.clientPhone,
-          organizerEmail: email,
-          quote
-        })
-      });
+      const { data: orcamento, error: orcamentoError } = await supabase
+        .from('orcamentos')
+        .insert([{
+          nome_cliente: quote.clientName || '',
+          email_cliente: quote.clientEmail || '',
+          telefone_cliente: quote.clientPhone || '',
+          nome_evento: quote.eventName || '',
+          email_organizador: email || '',
+          valor_total: quote.total || 0
+        }])
+        .select('id')
+        .single();
 
-      const data = await response.json().catch(() => ({}));
-      if (!response.ok) {
-        throw new Error(data.error || 'Erro ao enviar orçamento');
+      if (orcamentoError || !orcamento?.id) {
+        console.error('Supabase orcamento error:', orcamentoError);
+        throw new Error(orcamentoError?.message || 'Erro ao salvar orçamento no Supabase');
       }
 
-      if (data.warning) {
-        setMessageType('success');
-        setMessage(`Orçamento salvo. ${data.warning}`);
-      } else {
-        setMessageType('success');
-        setMessage('Orçamento enviado com sucesso ao organizador!');
+      const servicos = (quote.items || []).map(item => ({
+        orcamento_id: orcamento.id,
+        nome_servico: item.title || '',
+        descricao: item.info || '',
+        quantidade: 1,
+        preco_unitario: item.total || 0
+      }));
+
+      if (servicos.length) {
+        const { error: servicosError } = await supabase.from('orcamento_servicos').insert(servicos);
+        if (servicosError) {
+          console.error('Supabase servicos error:', servicosError);
+          throw new Error(servicosError.message || 'Erro ao salvar serviços do orçamento no Supabase');
+        }
       }
+
+      setMessageType('success');
+      setMessage('Orçamento salvo com sucesso no Supabase!');
     } catch (error: any) {
-      localStorage.setItem('djQuote', JSON.stringify({ ...quote, savedOffline: true }));
+      console.error('sendQuote error:', error);
       setMessageType('error');
-      setMessage('Servidor indisponível. Orçamento salvo localmente no navegador.');
+      setMessage(error.message || 'Falha ao salvar orçamento. Verifique o console.');
     }
   };
 
